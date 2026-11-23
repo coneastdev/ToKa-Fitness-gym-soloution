@@ -1,4 +1,11 @@
 .loginDiv {
-    width: 35%;
-    background: var(--bg-secondary);
+    width: 30%;
+    padding: 3vw;
+}
+
+@media (max-width: 600px) {
+    .loginDiv {
+        width: 95%;
+        padding: 5vw;
+    }
 }

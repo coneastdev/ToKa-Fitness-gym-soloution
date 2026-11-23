@@ -4,24 +4,29 @@
 {% endblock %}
 
 {% block content %}
-<br />
-<div class="container loginDiv">
-    <form>
+<br /><br /><br />
+<div class="container loginDiv p-3 rounded-5 bg-2">
+    <h2 style="text-align: center;">Welcome Back</h2>
+    <br />
+    <form action="/login" method="post">
     <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="loginInputEmail" aria-describedby="emailHelp" placeholder="email@example.com" required>
-        <div id="emailHelp" class="form-text">We’ll never share your email with anyone else.</div>
+        <input for="email" type="email" class="form-control" id="loginInputEmail" aria-describedby="emailHelp" placeholder="email@example.com" required>
     </div>
     <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">Password</label>
-        <input type="password" class="form-control" id="loginInputPassword" placeholder="Password" required>
+        <input for="password" type="password" class="form-control" id="loginInputPassword" placeholder="Password" required>
     </div>
     <div class="mb-3 form-field">
-        <input type="checkbox" id="exampleCheck1" class="check" required>
+        <input type="checkbox" id="exampleCheck1" class="check" checked required>
         <label for="exampleCheck1">I agree to the Terms and Conditions</label>
     </div>
-    <button type="submit" class="btn-solid theme-primary">Submit</button>
+    <div style="width: 50%; margin: 0 auto; text-align: center;">
+        <button style="width: 100%;" type="submit" class="btn-solid theme-primary">Login</button><br />
+        <a href="/signup">I want to sign up</a>
+    </div>
+    </form>
     </form>
 </div>
-
+<br /><br /><br />
 {% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<br /><br /><br />
+<div class="container loginDiv p-3 rounded-5 bg-2">
+    <h2 style="text-align: center;">Nice to meet you</h2>
+    <br />
+    <form action="/signup" method="post">
+    <div class="mb-3">
+        <label for="singupName" class="form-label">Name</label>
+        <input for="name" class="form-control" id="singupName" aria-describedby="name" placeholder="Name" required>
+    </div>
+    <div class="mb-3">
+        <label for="singupEmail" class="form-label">Email address</label>
+        <input for="email" type="email" class="form-control" id="singupEmail" aria-describedby="emailHelp" placeholder="email@example.com" required>
+    </div>
+    <div class="mb-3">
+        <label for="singupAge" class="form-label">Date Of Birth</label>
+        <input type="text" class="form-control w-12" id="singupAge" data-bs-toggle="datepicker" autocomplete="off" placeholder="Choose date…">
+        <div id="ageHelp" class="form-text">We ask this so we can properly handle your data.</div>
+    </div>
+    <div class="mb-3">
+        <label for="singupPassword" class="form-label">Password</label>
+        <input for="password" type="password" class="form-control" id="singupPassword" placeholder="Enter password">
+        <div class="strength-bar" data-bs-strength></div>
+        <span class="strength-text"></span>
+    </div>
+    <div class="mb-3 form-field">
+        <input type="checkbox" id="singupCheck" class="check" required>
+        <label for="singupCheck">I agree to the Terms and Conditions</label>
+    </div>
+    <div style="width: 50%; margin: 0 auto; text-align: center;">
+        <button style="width: 100%;" type="submit" class="btn-solid theme-primary">Sign up</button><br />
+        <a href="/login">I want to login</a>
+    </div>
+    </form>
+</div>
+<br /><br /><br />
+{% endblock %}
