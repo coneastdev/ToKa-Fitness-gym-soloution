@@ -14,22 +14,22 @@ class Subscriptions(SQLModel, table=True):
     next_payment: datetime
 
     users_id: int | None = Field(default=None, foreign_key="users.id")
-    plan: int | None = Field(default=None, foreign_key="subscriptionplans.id")
+    plan_id: int | None = Field(default=None, foreign_key="subscriptionplans.id")
 
 # session bookings
-class Session(SQLModel, table=True):
+class Sessions(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str
     description: str
     time: datetime
 
-    trainer: int | None = Field(default=None, foreign_key="users.id")
+    trainer_id: int | None = Field(default=None, foreign_key="users.id")
 
 class Booking(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
-    user: int | None = Field(default=None, foreign_key="users.id")
-    session: int | None = Field(default=None, foreign_key="session.id")
+    user_id: int | None = Field(default=None, foreign_key="users.id")
+    session_id: int | None = Field(default=None, foreign_key="sessions.id")
 
 # posts
 class Posts(SQLModel, table=True):
@@ -41,7 +41,7 @@ class Posts(SQLModel, table=True):
     date_published: datetime
     paid: bool
 
-    author: int | None = Field(default=None, foreign_key="users.id")
+    author_id: int | None = Field(default=None, foreign_key="users.id")
 
 class Tags(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -58,8 +58,8 @@ class PostTags(SQLModel, table=True):
 class Trackers(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
-    user: int | None = Field(default=None, foreign_key="users.id")
-    trainer: int | None = Field(default=None, foreign_key="users.id")
+    user_id: int | None = Field(default=None, foreign_key="users.id")
+    trainer_id: int | None = Field(default=None, foreign_key="users.id")
 
 class Exercises(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)

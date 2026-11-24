@@ -1,55 +1,40 @@
-import re 
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Annotated
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlmodel import Field, SQLModel, create_engine
+from sqlmodel import SQLModel, create_engine, Session, select
+from pydantic import BaseModel, Field
 
-import dbClasses
+from dbClasses import *
+import validation
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
-engine = create_engine(sqlite_url, echo=True)
+engine = create_engine(sqlite_url, echo=False)
 
 SQLModel.metadata.create_all(engine)
+
+def look_for_user(email: str, password: str) -> str:
+    with Session(engine) as session:
+        statement = select(Users).where(Users.email == email)
+        results = session.exec(statement)
+        if results:
+            for user in results:
+                if user.password == password:
+                    return "fullmatch"
+                else:
+                    return "wrongpassword"
+    return "notfound"
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
- 
-# Uses adapated AI generated code from task 1 C
-def validate_credentials(email: str, password: str) -> int: 
-    """Check if email and password are valid"""
-    email_valid = bool(re.fullmatch( 
-        # contains text @ text . text
-        r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+"
-        r"@[A-Za-z0-9](?:[A-Za-z0-9]{0,61}[A-Za-z0-9])?" 
-        r"(?:\.[A-Za-z0-9](?:[A-Za-z0-9]{0,61}[A-Za-z0-9])?)+", email,)
-    ) 
-    
-    password_valid = ( 
-        # contains lowercase, uppercase, number and special char
-        isinstance(password, str) 
-        and len(password) >= 8 
-        and re.search(r"[A-Z]", password)
-        and re.search(r"[a-z]", password) 
-        and re.search(r"\d", password) 
-        and re.search(r"[^A-Za-z0-9]", password) 
-    ) is not False 
-
-    if email_valid and password_valid: 
-        return 0 
-    if not email_valid and not password_valid: 
-        return 1 
-    if not email_valid: 
-        return 2 
-    return 4 
-
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
@@ -60,8 +45,12 @@ async def login(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
 @app.post("/login", response_class=HTMLResponse)
-async def login_post(request: Request):
+async def login_post(request: Request, email: Annotated[str, Form()], password: Annotated[str, Form()]):
     succues = False
+
+    if look_for_user(email, password) == "fullmatch":
+        succues = True
+
     if succues:
         return templates.TemplateResponse(request=request, name="index.html")
     else:
@@ -72,9 +61,26 @@ async def signup(request: Request):
     return templates.TemplateResponse(request=request, name="signup.html")
 
 @app.post("/signup", response_class=HTMLResponse)
-async def signup_post(request: Request):
+async def signup_post(request: Request, name: Annotated[str, Form()], email: Annotated[str, Form()], password: Annotated[str, Form()], dob: Annotated[str, Form()]):
     succues = False
+
+    password = validation.hash(password, email)
+
+    user = Users(name=name, email=email, dob=validation.convert(dob), password=password, created=datetime.now(timezone.utc), active=True, member=False, accountType=0)
+
+    if look_for_user(email, password) == "notfound":
+        try:
+            with Session(engine) as session:
+                session.add(user)
+                session.commit()
+        except Exception as e:
+            print(e)
+    else:
+        print("found user when tried to create")
+    
+    print("test")
     if succues:
-        return templates.TemplateResponse(request=request, name="index.html")
+        return templates.TemplateResponse(request=request, name="login.html")
     else:
         return templates.TemplateResponse(request=request, name="signup.html")
+
