@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlmodel import SQLModel, create_engine, Session, select
 from pydantic import BaseModel, Field
+from pwdlib import PasswordHash
 
 from dbClasses import *
 import validation
@@ -18,13 +19,15 @@ engine = create_engine(sqlite_url, echo=False)
 
 SQLModel.metadata.create_all(engine)
 
+password_hash = PasswordHash.recommended()
+
 def look_for_user(email: str, password: str) -> str:
     with Session(engine) as session:
         statement = select(Users).where(Users.email == email)
         results = session.exec(statement)
         if results:
             for user in results:
-                if user.password == password:
+                if password_hash.verify(password, user.password):
                     return "fullmatch"
                 else:
                     return "wrongpassword"
@@ -64,15 +67,14 @@ async def signup(request: Request):
 async def signup_post(request: Request, name: Annotated[str, Form()], email: Annotated[str, Form()], password: Annotated[str, Form()], dob: Annotated[str, Form()]):
     succues = False
 
-    password = validation.hash(password, email)
-
-    user = Users(name=name, email=email, dob=validation.convert(dob), password=password, created=datetime.now(timezone.utc), active=True, member=False, accountType=0)
+    user = Users(name=name, email=email, dob=validation.convert(dob), password=password_hash.hash(password), created=datetime.now(timezone.utc), active=True, member=False, accountType=0)
 
     if look_for_user(email, password) == "notfound":
         try:
             with Session(engine) as session:
                 session.add(user)
                 session.commit()
+            succues = True
         except Exception as e:
             print(e)
     else:

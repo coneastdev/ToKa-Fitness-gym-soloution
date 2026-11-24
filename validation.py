@@ -3,8 +3,6 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 import os
 
-from pwdlib import PasswordHash
-
 load_dotenv()
 
 # Uses adapated AI generated code from task 1 C
@@ -38,8 +36,3 @@ def validate_credentials(email: str, password: str) -> int:
 # uses AI generated code from google gemini
 def convert(date_time) -> datetime:
     return datetime.strptime(date_time, '%d/%m/%Y').replace(tzinfo=timezone.utc)
-
-def hash(password: str, email: str) -> str:
-    password_hash = PasswordHash.recommended()
-
-    return password_hash.hash(password + email + str(os.environ.get("SALT")))

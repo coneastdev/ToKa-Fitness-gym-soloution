@@ -11,3 +11,4 @@ wheels/
 
 # security
 *.env
+*.db
